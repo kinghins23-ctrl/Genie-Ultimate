@@ -5,8 +5,6 @@
 export async function sendFunnelToN8n(funnelResult: any) {
   const url = process.env.N8N_WEBHOOK_URL;
 
-  console.log("\n[sendFunnelToN8n] N8N_WEBHOOK_URL:", url);
-
   if (!url) {
     console.error("N8N_WEBHOOK_URL is not set in .env");
     return;
@@ -43,8 +41,6 @@ export async function sendFunnelToN8n(funnelResult: any) {
  */
 export async function sendPostToN8n(campaignResult: any, locationId: string) {
   const url = process.env.N8N_POST_WEBHOOK_URL;
-
-  console.log("\n[sendPostToN8n] Target URL:", url);
 
   if (!url) {
     console.error("N8N_POST_WEBHOOK_URL is missing in .env");
