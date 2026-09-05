@@ -1,43 +1,45 @@
 // src/app/api/genie/route.ts
 import { NextRequest, NextResponse } from "next/server";
-// Import the REAL Orchestrator logic we just built
 import { callOrchestrator } from "@/genies/orchestratorGenie";
 
-export const maxDuration = 60; // Allow 60 seconds for GPT-4 to think (Vercel specific)
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    const {
+      message,
+      businessName,
+      niche,
+      targetAudience,
+      leadMagnetType,
+      platforms,
+      locationId,
+      state,
+    } = body;
 
-    // 1. Extract inputs
-    const { message, locationId, state } = body;
+    const userMessage = message || [
+      businessName && `Business name: ${businessName}`,
+      niche && `Niche / industry: ${niche}`,
+      targetAudience && `Target audience: ${targetAudience}`,
+      leadMagnetType && `Lead magnet type: ${leadMagnetType}`,
+      Array.isArray(platforms) && `Platforms: ${platforms.join(", ")}`,
+    ].filter(Boolean).join("\n");
 
-    // 2. Validate
-    if (!message) {
+    if (!userMessage) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // 3. Prepare State
-    // We inject the locationId into the state so the Orchestrator passes it to the Post Genie
     const previousState = state || {};
-    
-    // Ensure GHL context is available
     if (locationId) {
-      previousState.ghl = { 
-        ...previousState.ghl, 
-        location_id: locationId 
-      };
+      previousState.ghl = { ...previousState.ghl, location_id: locationId };
     }
 
-    console.log("🤖 Orchestrator received:", message);
+    console.log("🤖 Orchestrator received:", userMessage);
     console.log("📍 Location ID:", locationId);
 
-    // 4. Call the Genie (The Brain)
-    const response = await callOrchestrator(message, previousState);
-
-    // 5. Return the result to the Frontend
+    const response = await callOrchestrator(userMessage, previousState);
     return NextResponse.json(response);
-
   } catch (err: any) {
     console.error("❌ API Error:", err);
     return NextResponse.json(
