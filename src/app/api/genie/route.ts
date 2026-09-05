@@ -39,6 +39,28 @@ export async function POST(req: NextRequest) {
     console.log("📍 Location ID:", locationId);
 
     const response = await callOrchestrator(userMessage, previousState);
+
+    // Keep the UI stable while downstream Genie action execution is added.
+    if (!response.lead_magnet) {
+      return NextResponse.json({
+        lead_magnet: {
+          title: "Orchestrator response",
+          subtitle: response.assistant_message_for_user || "",
+          markdown: JSON.stringify(response, null, 2),
+        },
+        offer: {
+          big_idea: "", hook: "", core_offer: "", value_stack: [],
+          bonuses: [], guarantee: "", cta: "", slug: "",
+        },
+        funnel: { funnel_name: "", slug: "", pages: [], event: {} },
+        workflow_build_guide: {
+          title: "", summary: "", ghl_area: "", estimated_time_minutes: 0,
+          steps: [], full_markdown: "",
+        },
+        posts: [],
+      });
+    }
+
     return NextResponse.json(response);
   } catch (err: any) {
     console.error("❌ API Error:", err);
