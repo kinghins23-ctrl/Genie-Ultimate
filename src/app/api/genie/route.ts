@@ -1,7 +1,7 @@
 // src/app/api/genie/route.ts
 import { NextRequest, NextResponse } from "next/server";
 // Import the REAL Orchestrator logic we just built
-import { callOrchestrator } from "@/genies/orchestrator"; 
+import { callOrchestrator } from "@/genies/orchestratorGenie";
 
 export const maxDuration = 60; // Allow 60 seconds for GPT-4 to think (Vercel specific)
 
